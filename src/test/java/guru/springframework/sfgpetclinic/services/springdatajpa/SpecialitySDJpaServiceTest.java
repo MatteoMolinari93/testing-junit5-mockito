@@ -1,11 +1,13 @@
 package guru.springframework.sfgpetclinic.services.springdatajpa;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.doThrow;
 
 import java.util.Optional;
 
@@ -22,7 +24,7 @@ import guru.springframework.sfgpetclinic.repositories.SpecialtyRepository;
 public class SpecialitySDJpaServiceTest {
 	
 	@Mock
-    SpecialtyRepository specialtyRepository;
+    SpecialtyRepository specialityRepository;
 
 	@InjectMocks
 	SpecialitySDJpaService service;
@@ -33,27 +35,27 @@ public class SpecialitySDJpaServiceTest {
 		
 		service.delete(speciality);
 		
-		verify(specialtyRepository).delete(any(Speciality.class));
+		verify(specialityRepository).delete(any(Speciality.class));
 	}
 	
 	@Test
 	void findByIdTest() {
 		Speciality speciality = new Speciality();
 		
-		when(specialtyRepository.findById(1l)).thenReturn(Optional.of(speciality));
+		when(specialityRepository.findById(1l)).thenReturn(Optional.of(speciality));
 		
 		Speciality foundSpeciality = service.findById(1l);
 		
 		assertNotNull(foundSpeciality);
 		
-		verify(specialtyRepository).findById(anyLong());
+		verify(specialityRepository).findById(anyLong());
 	}
 	
 	@Test
 	void deleteById() {
 		service.deleteById(1l);
 		
-		verify(specialtyRepository).deleteById(1l);
+		verify(specialityRepository).deleteById(1l);
 	}
 	
 	@Test
@@ -61,12 +63,21 @@ public class SpecialitySDJpaServiceTest {
 		service.deleteById(1l);
 		service.deleteById(1l);
 		
-		verify(specialtyRepository, atLeastOnce()).deleteById(1l);
+		verify(specialityRepository, atLeastOnce()).deleteById(1l);
 	}
 	
 	@Test
 	void delete() {
 		service.delete(new Speciality());
+	}
+	
+	@Test 
+	void testDoThrow() {
+		doThrow(new RuntimeException("boom")).when(specialityRepository).delete(any());
+		
+		assertThrows(RuntimeException.class, () -> specialityRepository.delete(new Speciality()));
+		
+		verify(specialityRepository).delete(any());
 	}
 
 }
