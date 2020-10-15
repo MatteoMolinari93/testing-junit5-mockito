@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyLong;
 
 import java.util.Optional;
 
@@ -26,6 +28,15 @@ public class SpecialitySDJpaServiceTest {
 	SpecialitySDJpaService service;
 	
 	@Test
+	void testDeleteByObject() {
+		Speciality speciality = new Speciality();
+		
+		service.delete(speciality);
+		
+		verify(specialtyRepository).delete(any(Speciality.class));
+	}
+	
+	@Test
 	void findByIdTest() {
 		Speciality speciality = new Speciality();
 		
@@ -35,7 +46,7 @@ public class SpecialitySDJpaServiceTest {
 		
 		assertNotNull(foundSpeciality);
 		
-		verify(specialtyRepository).findById(1l);
+		verify(specialtyRepository).findById(anyLong());
 	}
 	
 	@Test
