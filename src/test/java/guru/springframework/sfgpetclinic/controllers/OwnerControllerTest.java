@@ -1,13 +1,18 @@
 package guru.springframework.sfgpetclinic.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.any;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -28,7 +33,31 @@ class OwnerControllerTest implements ControllerTests {
 
 	@InjectMocks
     OwnerController ownerController;
+	
+	@Captor
+	ArgumentCaptor<String> stringArgumentCaptor;
 
+	@Test
+	void processFindFormWildcardString() {
+		Owner owner = new Owner(2l, "Matteo", "Molinari");
+		List<Owner> owners = new ArrayList<>();
+		final ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+		when(ownerService.findAllByLastNameLike(captor.capture())).thenReturn(owners);
+		
+		String viewName = ownerController.processFindForm(owner, result, null);
+		assertTrue(captor.getValue().equalsIgnoreCase("%molinari%"));
+	}
+	
+	@Test
+	void processFindFormWildcardStringAnnotation() {
+		Owner owner = new Owner(2l, "Matteo", "Molinari");
+		List<Owner> owners = new ArrayList<>();
+		when(ownerService.findAllByLastNameLike(stringArgumentCaptor.capture())).thenReturn(owners);
+		
+		String viewName = ownerController.processFindForm(owner, result, null);
+		assertTrue(stringArgumentCaptor.getValue().equalsIgnoreCase("%molinari%"));
+	}
+	
     @Test
     void testProcessCreationFormReturnErrorView() {
     	when(result.hasErrors()).thenReturn(true);
