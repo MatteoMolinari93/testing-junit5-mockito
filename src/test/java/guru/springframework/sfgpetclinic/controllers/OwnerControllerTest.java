@@ -3,8 +3,11 @@ package guru.springframework.sfgpetclinic.controllers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.inOrder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -30,6 +34,9 @@ class OwnerControllerTest implements ControllerTests {
 
 	@Mock
     OwnerService ownerService;
+	
+	@Mock
+	Model model;
 	
 	@Mock
 	BindingResult result;
@@ -91,8 +98,13 @@ class OwnerControllerTest implements ControllerTests {
 	void processFindFormWildcardStringAnnotationManyFound() {
 		Owner owner = new Owner(2l, "Matteo", "MolinariFindMe");
 		
-		String viewName = ownerController.processFindForm(owner, result, Mockito.mock(Model.class));
+		InOrder inOrder = inOrder(ownerService, model);
+		
+		String viewName = ownerController.processFindForm(owner, result, model);
 		assertTrue(viewName.equalsIgnoreCase("owners/ownersList"));
+		
+		inOrder.verify(ownerService).findAllByLastNameLike(any());
+		inOrder.verify(model).addAttribute(anyString(), anyList());
 	}
 	
     @Test
